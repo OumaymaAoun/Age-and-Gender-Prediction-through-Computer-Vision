@@ -1,0 +1,32 @@
+import cv2
+
+img = cv2.imread('images/employee.png')
+classnames = []
+classfile ='files/thing.names'
+
+with open (classfile , 'rt') as f :
+    classnames = f.read().rstrip('\n').split('\n') #read bech ta9ralek l file lkol
+                                                    #rstrip ta9ra partie w tfasakh m3a kol rjou3 l star ex ta9ra person w tafsakh eli tahtou lkol ba3ed ta9ra bicycle w tafsakh eli ba3dou lkol
+                                                   #split bech tkawen des chanes des caracters w yet3abou f tableau
+print(classnames)
+p='files/frozen_inference_graph.pb'
+v= 'files/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+
+net = cv2.dnn_DetectionModel(p, v)
+net.setInputSize(320, 230)
+net.setInputScale(1.0 / 127.5)
+net.setInputMean((127.5, 127.5, 127.5))
+net.setInputSwapRB(True)
+
+
+classIds , confs , bbox = net.detect(img , confThreshold=0.4) #confThreshold hiya de9et l fahs
+#print(classIds , bbox)
+#boucle for bech yo93ed y3awed kol mara yet3aref ala had bech ytala3 eli f taswira lkol
+for classId , confidence , box in zip(classIds.flatten() , confs.flatten() , bbox) :
+    cv2.rectangle(img , box , color=(0,255,0) , thickness=3)
+    cv2.putText(img , classnames[classId -1] , (box[0] +10 , box[1]+20) , cv2.FONT_HERSHEY_COMPLEX,1
+                ,(255,255,0) , thickness=2)
+
+
+cv2.imshow('onglet',img)
+cv2.waitKey(0)
